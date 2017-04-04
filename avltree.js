@@ -15,15 +15,14 @@
  * data objects can vary between subsequent calls provided that the tree
  * ordering is not violated.
  *
- * There are three types of functions used for locating tree nodes.
+ * There are two types of functions used for locating tree nodes.
  *
- *  - Predicates ("pred"): Receives a (data) item, returns bool.
- *  - Tester ("test"): Receives a (data) item, returns and integer (<0, 0, >0)
- *        indicating whether the item was found or in which direction to
- *        continue searching.
- *  - Comparison ("cmp"): Receives a data item for meant for insertion and a
- *        data items that is already in the tree. Returns an integer like
- *        tester functions which describes NEWITEM <cmp> OLDITEM.
+ *  - Tester ("test"): Receives a (data) item, returns an integer (<0, 0, >0)
+ *      indicating whether the item was found or in which direction to continue
+ *      the search.
+ *  - Comparison ("cmp"): Receives a data item meant for insertion and a data
+ *      item that is already in the tree. Returns an integer (just like tester
+ *      functions) which describes NEWITEM <cmp> OLDITEM.
  *
  *  The tree constructor takes a comparison function which can be used
  *  implicitly in further calls for convenience. Other functions can be used
@@ -172,26 +171,26 @@ let avltree = (function() {
       return node;
   }
 
-  function find_first_with_test(node, pred) {
+  function find_first_with_test(node, test) {
     if (node == null)
       return null;
-    let nl = find_first_with_test(node.left, pred);
+    let nl = find_first_with_test(node.left, test);
     if (nl)
       return nl;
-    if (pred(node.data))
+    if (test(node.data))
       return node;
-    return find_first_with_test(node.right, pred);
+    return find_first_with_test(node.right, test);
   }
 
-  function find_last_with_test(node, pred) {
+  function find_last_with_test(node, test) {
     if (node == null)
         return null;
-    let nr = find_last_with_test(node.right, pred);
+    let nr = find_last_with_test(node.right, test);
     if (nr)
       return nr;
-    if (pred(node.data))
+    if (test(node.data))
       return node;
-    return find_last_with_test(node.left, pred);
+    return find_last_with_test(node.left, test);
   }
 
   /*
@@ -272,8 +271,8 @@ let avltree = (function() {
    * If no item tests as true, null is returned. Otherwise, the least item in
    * the tree (with respect to the ordering) that tests as true is returned.
    */
-  Avltree.prototype.find_first_with_test = function Avltree_find_first_with_test(pred) {
-    return find_first_with_test(this.root, pred);
+  Avltree.prototype.find_first_with_test = function Avltree_find_first_with_test(test) {
+    return find_first_with_test(this.root, test);
   }
 
   /*
@@ -283,8 +282,8 @@ let avltree = (function() {
    * monotonous instead of positively monotonous. The first item that tests to
    * true (if any) is returned.
    */
-  Avltree.prototype.find_last_with_test = function Avltree_find_last_with_test(pred) {
-    return find_last_with_test(this.root, pred);
+  Avltree.prototype.find_last_with_test = function Avltree_find_last_with_test(test) {
+    return find_last_with_test(this.root, test);
   }
 
   /* Tests. Play-test for better coverage ;-) */
